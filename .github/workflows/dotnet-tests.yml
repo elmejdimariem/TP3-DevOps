@@ -1,5 +1,5 @@
 
-name: .NET Tests
+name: Automated Tests
 
 on:
   push:
@@ -10,18 +10,28 @@ on:
 jobs:
   test-python:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Run Python Tests
+      - name: Run Python Tests and Generate XML Report
         run: |
           cd python-app
-          python -m unittest
+          pip install unittest-xml-reporting
+          python test_math_utils.py
+
+      - name: Upload Python Test Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-test-report
+          path: python-app/test-reports
+
   build-and-test:
     runs-on: ubuntu-latest
 
@@ -42,3 +52,9 @@ jobs:
 
       - name: Run tests
         run: dotnet test dotnet-app.Tests/ProjectFile-Tests.csproj --no-build --logger "trx;LogFileName=test-results.trx"
+
+      - name: Upload .NET Test Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: dotnet-test-report
+          path: dotnet-app.Tests/TestResults/test-results.trx

@@ -2,3 +2,4 @@
 **/obj/
 **/TestResults/
 __pycache__/
+python-app/test-reports/
